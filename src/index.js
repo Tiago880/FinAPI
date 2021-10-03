@@ -1,21 +1,43 @@
+/* ## Regras de negócio
+- [x] Não deve ser possível cadastrar uma conta com CPF já existente
+*/
 const express = require("express");
-const {v4: uuidv4} = require("uuid")
 const app = express();
+
+const {
+    v4: uuidv4
+} = require("uuid")
+
 
 app.use(express.json());
 const customers = [];
 
-app.post("/account", (request , response) => {
+app.post("/account", (request, response) => {
 
-    const {cpf, name} = request.body;
+    const {
+        cpf,
+        name
+    } = request.body;
 
-    const id = uuidv4();
+    const customersAlreadyExists = customers.some(
+        (customer) => customer.cpf === cpf
+    );
+
+
+
+
+    if (customersAlreadyExists) {
+        return response.status(400).json({
+            error: "Customer already exists !"
+        });
+    }
+
 
     customers.push({
         cpf,
         name,
-        id,
-        statemente: []
+        id: uuidv4(),
+        statement: []
     });
 
     return response.status(201).send();
