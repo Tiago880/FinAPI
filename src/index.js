@@ -1,6 +1,4 @@
-/* ## Regras de negócio
-- [x] Não deve ser possível cadastrar uma conta com CPF já existente
-*/
+
 const express = require("express");
 const app = express();
 
@@ -23,9 +21,6 @@ app.post("/account", (request, response) => {
         (customer) => customer.cpf === cpf
     );
 
-
-
-
     if (customersAlreadyExists) {
         return response.status(400).json({
             error: "Customer already exists !"
@@ -43,4 +38,13 @@ app.post("/account", (request, response) => {
     return response.status(201).send();
 });
 
+
+
+app.get("/statement/:cpf", (request, response) => {
+    const {cpf} = request.params;
+
+    const customer = customers.find(customer => customer.cpf === cpf);
+    return response.json(customer.statement);
+
+});
 app.listen(3333);
