@@ -1,3 +1,4 @@
+//Verificar se é uma conta existente
 const express = require("express");
 const app = express();
 
@@ -8,6 +9,24 @@ const {
 
 app.use(express.json());
 const customers = [];
+
+//Middleware
+
+function verifyExistsAccountCPF(request, response, next) {
+    const {
+        cpf
+    } = request.headers;
+
+    const customer = customers.find(customer => customer.cpf === cpf);
+
+    if (!customer) {
+        return response.status(400).json({
+            error: "Customer not found!"
+        });
+    }
+    request.customer = customer;
+    return next();
+}
 
 app.post("/account", (request, response) => {
 
@@ -38,20 +57,11 @@ app.post("/account", (request, response) => {
 });
 
 
+app.get("/statement", verifyExistsAccountCPF, (request, response) => {
 
-app.get("/statement", (request, response) => {
     const {
-        cpf
-    } = request.headers;
-
-    const customer = customers.find(customer => customer.cpf === cpf);
-
-    if (!customer) {
-        return response.status(400).json({
-            error: "Customer not found!"
-        });
-    }
-
+        customer
+    } = request;
     return response.json(customer.statement);
 
 });
